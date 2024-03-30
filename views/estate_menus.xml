@@ -2,14 +2,14 @@
 <odoo>
 
     <menuitem
-        id="estate_property_root"
+        id="estate.property_root"
         name="Real Estate">
         <menuitem
-            id="estate_property_ads"
+            id="estate.property_ads"
             name="Advertisements">
             <menuitem
-                id="estate_property_menu_action"
-                action="estate_property_action"/>
+                id="estate.property_menu_action"
+                action="estate.property_action"/>
         </menuitem>
     </menuitem>
 </odoo>
