@@ -11,5 +11,15 @@
                 id="estate.property_menu_action"
                 action="estate.property_action"/>
         </menuitem>
+        <menuitem
+            id="estate.property_settings"
+            name="Settings">
+            <menuitem
+                id="estate.property_type_menu_action"
+                action="estate.property_type_action"/>
+            <menuitem
+                id="estate.property_tag_menu_action"
+                action="estate.property_tag_action"/>
+        </menuitem>
     </menuitem>
 </odoo>
