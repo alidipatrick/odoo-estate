@@ -1,4 +1,4 @@
-from odoo import fields, models, tools
+from odoo import fields, models, tools, api
 
 class EstateProperty(models.Model):
     _name = "estate.property"
@@ -12,15 +12,36 @@ class EstateProperty(models.Model):
     expected_price = fields.Float('Expected Price', required=True)
     selling_price = fields.Float('Selling Price', readonly=True, copy=False)
     bedrooms = fields.Integer('Bedrooms', default=2)
-    living_area = fields.Integer('Living Area (sqm)')
     facades = fields.Integer('Facades')
     garage = fields.Boolean('Garage')
     garden = fields.Boolean('Garden')
-    garden_area = fields.Integer('Garden Area (sqm)')
     garden_orientation = fields.Selection([('north', 'North'), (['south', 'South']), ('east', 'East'), ('west', 'West')], string='Garden Orientation')
+    garden_area = fields.Integer('Garden Area (sqm)')
+    living_area = fields.Integer('Living Area (sqm)')
+    total_area = fields.Integer('Total Area (sqm)', compute='_total_area')
     active = fields.Boolean(default=True)
     state = fields.Selection([('new','New'), ('offer_received','Offer Received'), ('offer_accepted','Offer Accepted'), ('sold','Sold'), ('canceled','Canceled')], required=True, default='new')
     salesperson = fields.Many2one('res.users', string='Salesman', default=lambda self: self.env.uid)
     buyer = fields.Many2one('res.partner', string='Buyer', copy=False)
     tag_ids = fields.Many2many('estate.property.tag', string="Tags")
     offer_ids = fields.One2many('estate.property.offer', 'property_id', string='Offers')
+    best_price = fields.Float('Best Offer', compute='_get_best_offer', default=0)
+
+    @api.depends('living_area', 'garden_area')
+    def _total_area(self):
+        for estateProperty in self:
+            estateProperty.total_area = estateProperty.living_area + estateProperty.garden_area
+
+    @api.depends('offer_ids')
+    def _get_best_offer(self):
+        for estateProperty in self:
+            estateProperty.best_price = max(estateProperty.offer_ids.mapped('price'))
+
+    @api.onchange('garden')
+    def _onchange_garden(self):
+        if self.garden == True:
+            self.garden_area = 10
+            self.garden_orientation = 'north'
+        else:
+            self.garden_area = 0
+            self.garden_orientation = False
