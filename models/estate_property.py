@@ -1,4 +1,6 @@
 from odoo import fields, models, tools, api
+from odoo.exceptions import UserError, AccessError
+from odoo.tools.translate import _
 
 class EstateProperty(models.Model):
     _name = "estate.property"
@@ -35,7 +37,10 @@ class EstateProperty(models.Model):
     @api.depends('offer_ids')
     def _get_best_offer(self):
         for estateProperty in self:
-            estateProperty.best_price = max(estateProperty.offer_ids.mapped('price'))
+            if len(estateProperty.offer_ids) == 0:
+                estateProperty.best_price = 0
+            else:
+                estateProperty.best_price = max(estateProperty.offer_ids.mapped('price'))
 
     @api.onchange('garden')
     def _onchange_garden(self):
@@ -45,3 +50,19 @@ class EstateProperty(models.Model):
         else:
             self.garden_area = 0
             self.garden_orientation = False
+
+    def action_set_sold(self):
+        for estateProperty in self:
+            if estateProperty.state == 'canceled':
+                raise UserError(_("A canceled property cannot be set as sold"))
+            else:
+                estateProperty.state = 'sold'
+        return True
+
+    def action_cancel_property(self):
+        for estateProperty in self:
+            if estateProperty.state == 'sold':
+                raise UserError(_("A sold property cannot be canceled"))
+            else:
+                estateProperty.state = 'canceled'
+        return True

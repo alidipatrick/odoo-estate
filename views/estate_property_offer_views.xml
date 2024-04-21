@@ -10,6 +10,8 @@
                 <field name="partner_id" />
                 <field name="validity" />
                 <field name="date_deadline" />
+                <button help="Accept" name="action_accept_offer" type="object" class="oe_highlight" icon="fa-check"/>
+                <button help="Refuse" name="action_refuse_offer" type="object" class="oe_highlight" icon="fa-xmark"/>
                 <field name="status" />
             </tree>
         </field>
